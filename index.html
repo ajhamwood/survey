@@ -4,44 +4,70 @@
   <title>Meetup Country of Origin Survey</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="keywords" content="key, words">
-  <meta name="description" content="Description.">
+  <meta name="keywords" content="country, country of origin, survey">
+  <meta name="description" content="Simple survey to record (client-side) the country of origin of a group of people.">
   <link rel="shortcut icon" href="data:image/png;base64,">
   <style>
 html, body {
-  margin: 1rem
+  height: calc(100% - 2rem)
+}
+body {
+  display: flex;
+  flex-flow: column;
+  margin: 2rem
+}
+main {
+  flex: 1;
+  overflow-y: auto
+}
+footer {
+  flex: 0;
+  margin-top: 2rem
 }
 h1 {
-  font-family: sans-serif
+  font-family: sans-serif;
+  margin-top: 0
 }
-select, button {
+#tallies {
+  display: table;
+  margin-bottom: .5rem
+}
+.tally {
+  display: table-row
+}
+.tally > * {
+  display: table-cell;
+  padding: .5rem
+}
+select {
   font-size: large;
-  margin-bottom: 2rem
+  margin-bottom: 2rem;
+  width: calc(100% - 4rem)
 }
-button[type=submit] {
+button {
+  font-size: large;
+  padding: 1px
+}
+#increment-new, #undo {
   float: right
-}
-#reset {
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
-  margin: 0
 }
   </style>
 </head>
 <body>
-  <h1>Meetup Country of Origin Survey</h1>
-  <form id="country" target="_self">
+  <main>
+    <h1>Meetup Country of Origin Survey</h1>
+    <div id="tallies"></div>
     <select id="country-list">
       <option value="-- Choose one --" selected disabled>-- Choose one --</option>
       <option value="Afghanistan">Afghanistan</option>
+      <option value="Åland Islands">Åland Islands</option>
       <option value="Albania">Albania</option>
       <option value="Algeria">Algeria</option>
       <option value="American Samoa">American Samoa</option>
       <option value="Andorra">Andorra</option>
       <option value="Angola">Angola</option>
       <option value="Anguilla">Anguilla</option>
-      <option value="Antartica">Antarctica</option>
+      <option value="Antarctica">Antarctica</option>
       <option value="Antigua and Barbuda">Antigua and Barbuda</option>
       <option value="Argentina">Argentina</option>
       <option value="Armenia">Armenia</option>
@@ -59,8 +85,9 @@ button[type=submit] {
       <option value="Benin">Benin</option>
       <option value="Bermuda">Bermuda</option>
       <option value="Bhutan">Bhutan</option>
-      <option value="Bolivia">Bolivia</option>
-      <option value="Bosnia and Herzegowina">Bosnia and Herzegowina</option>
+      <option value="Bolivia, Plurinational State of">Bolivia, Plurinational State of</option>
+      <option value="Bonaire, Sint Eustatius and Saba">Bonaire, Sint Eustatius and Saba</option>
+      <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
       <option value="Botswana">Botswana</option>
       <option value="Bouvet Island">Bouvet Island</option>
       <option value="Brazil">Brazil</option>
@@ -79,23 +106,23 @@ button[type=submit] {
       <option value="Chile">Chile</option>
       <option value="China">China</option>
       <option value="Christmas Island">Christmas Island</option>
-      <option value="Cocos Islands">Cocos (Keeling) Islands</option>
+      <option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
       <option value="Colombia">Colombia</option>
       <option value="Comoros">Comoros</option>
       <option value="Congo">Congo</option>
-      <option value="Congo">Congo, the Democratic Republic of the</option>
+      <option value="Congo, the Democratic Republic of the">Congo, the Democratic Republic of the</option>
       <option value="Cook Islands">Cook Islands</option>
       <option value="Costa Rica">Costa Rica</option>
-      <option value="Cota D'Ivoire">Cote d'Ivoire</option>
-      <option value="Croatia">Croatia (Hrvatska)</option>
+      <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+      <option value="Croatia">Croatia</option>
       <option value="Cuba">Cuba</option>
+      <option value="Curaçao">Curaçao</option>
       <option value="Cyprus">Cyprus</option>
       <option value="Czech Republic">Czech Republic</option>
       <option value="Denmark">Denmark</option>
       <option value="Djibouti">Djibouti</option>
       <option value="Dominica">Dominica</option>
       <option value="Dominican Republic">Dominican Republic</option>
-      <option value="East Timor">East Timor</option>
       <option value="Ecuador">Ecuador</option>
       <option value="Egypt">Egypt</option>
       <option value="El Salvador">El Salvador</option>
@@ -103,12 +130,11 @@ button[type=submit] {
       <option value="Eritrea">Eritrea</option>
       <option value="Estonia">Estonia</option>
       <option value="Ethiopia">Ethiopia</option>
-      <option value="Falkland Islands">Falkland Islands (Malvinas)</option>
+      <option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
       <option value="Faroe Islands">Faroe Islands</option>
       <option value="Fiji">Fiji</option>
       <option value="Finland">Finland</option>
       <option value="France">France</option>
-      <option value="France Metropolitan">France, Metropolitan</option>
       <option value="French Guiana">French Guiana</option>
       <option value="French Polynesia">French Polynesia</option>
       <option value="French Southern Territories">French Southern Territories</option>
@@ -124,44 +150,47 @@ button[type=submit] {
       <option value="Guadeloupe">Guadeloupe</option>
       <option value="Guam">Guam</option>
       <option value="Guatemala">Guatemala</option>
+      <option value="Guernsey">Guernsey</option>
       <option value="Guinea">Guinea</option>
       <option value="Guinea-Bissau">Guinea-Bissau</option>
       <option value="Guyana">Guyana</option>
       <option value="Haiti">Haiti</option>
-      <option value="Heard and McDonald Islands">Heard and Mc Donald Islands</option>
-      <option value="Holy See">Holy See (Vatican City State)</option>
+      <option value="Heard Island and McDonald Islands">Heard Island and McDonald Islands</option>
+      <option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
       <option value="Honduras">Honduras</option>
       <option value="Hong Kong">Hong Kong</option>
       <option value="Hungary">Hungary</option>
       <option value="Iceland">Iceland</option>
       <option value="India">India</option>
       <option value="Indonesia">Indonesia</option>
-      <option value="Iran">Iran (Islamic Republic of)</option>
+      <option value="Iran, Islamic Republic of">Iran, Islamic Republic of</option>
       <option value="Iraq">Iraq</option>
       <option value="Ireland">Ireland</option>
+      <option value="Isle of Man">Isle of Man</option>
       <option value="Israel">Israel</option>
       <option value="Italy">Italy</option>
       <option value="Jamaica">Jamaica</option>
       <option value="Japan">Japan</option>
+      <option value="Jersey">Jersey</option>
       <option value="Jordan">Jordan</option>
       <option value="Kazakhstan">Kazakhstan</option>
       <option value="Kenya">Kenya</option>
       <option value="Kiribati">Kiribati</option>
-      <option value="Democratic People's Republic of Korea">Korea, Democratic People's Republic of</option>
-      <option value="Korea">Korea, Republic of</option>
+      <option value="Korea, Democratic People's Republic of">Korea, Democratic People's Republic of</option>
+      <option value="Korea, Republic of">Korea, Republic of</option>
       <option value="Kuwait">Kuwait</option>
       <option value="Kyrgyzstan">Kyrgyzstan</option>
-      <option value="Lao">Lao People's Democratic Republic</option>
+      <option value="Lao People's Democratic Republic">Lao People's Democratic Republic</option>
       <option value="Latvia">Latvia</option>
       <option value="Lebanon">Lebanon</option>
       <option value="Lesotho">Lesotho</option>
       <option value="Liberia">Liberia</option>
-      <option value="Libyan Arab Jamahiriya">Libyan Arab Jamahiriya</option>
+      <option value="Libya">Libya</option>
       <option value="Liechtenstein">Liechtenstein</option>
       <option value="Lithuania">Lithuania</option>
       <option value="Luxembourg">Luxembourg</option>
-      <option value="Macau">Macau</option>
-      <option value="Macedonia">Macedonia, The Former Yugoslav Republic of</option>
+      <option value="Macao">Macao</option>
+      <option value="Macedonia, the former Yugoslav Republic of">Macedonia, the former Yugoslav Republic of</option>
       <option value="Madagascar">Madagascar</option>
       <option value="Malawi">Malawi</option>
       <option value="Malaysia">Malaysia</option>
@@ -174,10 +203,11 @@ button[type=submit] {
       <option value="Mauritius">Mauritius</option>
       <option value="Mayotte">Mayotte</option>
       <option value="Mexico">Mexico</option>
-      <option value="Micronesia">Micronesia, Federated States of</option>
-      <option value="Moldova">Moldova, Republic of</option>
+      <option value="Micronesia, Federated States of">Micronesia, Federated States of</option>
+      <option value="Moldova, Republic of">Moldova, Republic of</option>
       <option value="Monaco">Monaco</option>
       <option value="Mongolia">Mongolia</option>
+      <option value="Montenegro">Montenegro</option>
       <option value="Montserrat">Montserrat</option>
       <option value="Morocco">Morocco</option>
       <option value="Mozambique">Mozambique</option>
@@ -186,7 +216,6 @@ button[type=submit] {
       <option value="Nauru">Nauru</option>
       <option value="Nepal">Nepal</option>
       <option value="Netherlands">Netherlands</option>
-      <option value="Netherlands Antilles">Netherlands Antilles</option>
       <option value="New Caledonia">New Caledonia</option>
       <option value="New Zealand">New Zealand</option>
       <option value="Nicaragua">Nicaragua</option>
@@ -199,6 +228,7 @@ button[type=submit] {
       <option value="Oman">Oman</option>
       <option value="Pakistan">Pakistan</option>
       <option value="Palau">Palau</option>
+      <option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option>
       <option value="Panama">Panama</option>
       <option value="Papua New Guinea">Papua New Guinea</option>
       <option value="Paraguay">Paraguay</option>
@@ -209,42 +239,48 @@ button[type=submit] {
       <option value="Portugal">Portugal</option>
       <option value="Puerto Rico">Puerto Rico</option>
       <option value="Qatar">Qatar</option>
-      <option value="Reunion">Reunion</option>
+      <option value="Réunion">Réunion</option>
       <option value="Romania">Romania</option>
-      <option value="Russia">Russian Federation</option>
+      <option value="Russian Federation">Russian Federation</option>
       <option value="Rwanda">Rwanda</option>
+      <option value="Saint Barthélemy">Saint Barthélemy</option>
+      <option value="Saint Helena, Ascension and Tristan da Cunha">Saint Helena, Ascension and Tristan da Cunha</option>
       <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
-      <option value="Saint LUCIA">Saint LUCIA</option>
-      <option value="Saint Vincent">Saint Vincent and the Grenadines</option>
+      <option value="Saint Lucia">Saint Lucia</option>
+      <option value="Saint Martin (French part)">Saint Martin (French part)</option>
+      <option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+      <option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
       <option value="Samoa">Samoa</option>
       <option value="San Marino">San Marino</option>
       <option value="Sao Tome and Principe">Sao Tome and Principe</option>
       <option value="Saudi Arabia">Saudi Arabia</option>
       <option value="Senegal">Senegal</option>
+      <option value="Serbia">Serbia</option>
       <option value="Seychelles">Seychelles</option>
-      <option value="Sierra">Sierra Leone</option>
+      <option value="Sierra Leone">Sierra Leone</option>
       <option value="Singapore">Singapore</option>
-      <option value="Slovakia">Slovakia (Slovak Republic)</option>
+      <option value="Sint Maarten (Dutch part)">Sint Maarten (Dutch part)</option>
+      <option value="Slovakia">Slovakia</option>
       <option value="Slovenia">Slovenia</option>
       <option value="Solomon Islands">Solomon Islands</option>
       <option value="Somalia">Somalia</option>
       <option value="South Africa">South Africa</option>
-      <option value="South Georgia">South Georgia and the South Sandwich Islands</option>
-      <option value="Span">Spain</option>
-      <option value="SriLanka">Sri Lanka</option>
-      <option value="St. Helena">St. Helena</option>
-      <option value="St. Pierre and Miguelon">St. Pierre and Miquelon</option>
+      <option value="South Georgia and the South Sandwich Islands">South Georgia and the South Sandwich Islands</option>
+      <option value="South Sudan">South Sudan</option>
+      <option value="Spain">Spain</option>
+      <option value="Sri Lanka">Sri Lanka</option>
       <option value="Sudan">Sudan</option>
       <option value="Suriname">Suriname</option>
-      <option value="Svalbard">Svalbard and Jan Mayen Islands</option>
+      <option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
       <option value="Swaziland">Swaziland</option>
       <option value="Sweden">Sweden</option>
       <option value="Switzerland">Switzerland</option>
-      <option value="Syria">Syrian Arab Republic</option>
-      <option value="Taiwan">Taiwan, Province of China</option>
+      <option value="Syrian Arab Republic">Syrian Arab Republic</option>
+      <option value="Taiwan, Province of China">Taiwan, Province of China</option>
       <option value="Tajikistan">Tajikistan</option>
-      <option value="Tanzania">Tanzania, United Republic of</option>
+      <option value="Tanzania, United Republic of">Tanzania, United Republic of</option>
       <option value="Thailand">Thailand</option>
+      <option value="Timor-Leste">Timor-Leste</option>
       <option value="Togo">Togo</option>
       <option value="Tokelau">Tokelau</option>
       <option value="Tonga">Tonga</option>
@@ -252,7 +288,7 @@ button[type=submit] {
       <option value="Tunisia">Tunisia</option>
       <option value="Turkey">Turkey</option>
       <option value="Turkmenistan">Turkmenistan</option>
-      <option value="Turks and Caicos">Turks and Caicos Islands</option>
+      <option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
       <option value="Tuvalu">Tuvalu</option>
       <option value="Uganda">Uganda</option>
       <option value="Ukraine">Ukraine</option>
@@ -263,22 +299,31 @@ button[type=submit] {
       <option value="Uruguay">Uruguay</option>
       <option value="Uzbekistan">Uzbekistan</option>
       <option value="Vanuatu">Vanuatu</option>
-      <option value="Venezuela">Venezuela</option>
-      <option value="Vietnam">Viet Nam</option>
-      <option value="Virgin Islands (British)">Virgin Islands (British)</option>
-      <option value="Virgin Islands (U.S)">Virgin Islands (U.S.)</option>
-      <option value="Wallis and Futana Islands">Wallis and Futuna Islands</option>
+      <option value="Venezuela, Bolivarian Republic of">Venezuela, Bolivarian Republic of</option>
+      <option value="Viet Nam">Viet Nam</option>
+      <option value="Virgin Islands, British">Virgin Islands, British</option>
+      <option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option>
+      <option value="Wallis and Futuna">Wallis and Futuna</option>
       <option value="Western Sahara">Western Sahara</option>
       <option value="Yemen">Yemen</option>
-      <option value="Yugoslavia">Yugoslavia</option>
       <option value="Zambia">Zambia</option>
       <option value="Zimbabwe">Zimbabwe</option>
     </select>
-    <button type="submit" value="Submit">Submit</button>
-  </form>
-  <button id="dump" value="Dump">Dump</button>
-  <div id="result"></div>
-  <button id="reset" value="Reset">Reset</button>
+    <button id="increment-new" value="+1">+1</button>
+  </main>
+  <footer>
+    <button id="reset" value="Reset">Reset</button>
+    <button id="undo" value="Undo">Undo</button>
+  </footer>
+  <template id="tally"
+    ><div class="tally">
+      <div class="tally-count">0</div>
+      <div class="tally-country"></div>
+      <div class="tally-increment">
+        <button value="+1">+1</button>
+      </div>
+    </div
+  ></template>
   <script>
 function $(sel, node) { return Array.prototype.slice.call( (node || document).querySelectorAll(sel) ) }
 $.addEvents = function (obj, node) {
@@ -286,71 +331,136 @@ $.addEvents = function (obj, node) {
     for (var ns = q ? $(q, node) : [window, document], es = e.split(" "), i = 0; i < es.length; i++)
       typeof ns === "undefined" || ns.forEach(n => n.addEventListener(es[i], obj[q][e].bind(n)))
 };
+$.load = function (id, node) { (node || document.body).appendChild(document.importNode($("#" + id)[0].content, true)) };
 function Drum () {
   return new Promise(resolve => {
-    var req = indexedDB.open("survey", 1);
+    var req = indexedDB.open("survey", 2);
     req.onupgradeneeded = e => {
-      let store = e.target.result.createObjectStore("surveyStore", {autoIncrement: true});
-      store.put(0, 0)
+      let db = e.target.result,
+          tally = db.createObjectStore("tallyStore", {autoIncrement: true}),
+          suggested = db.createObjectStore("suggestedStore", {autoIncrement: true});
+      if (e.oldVersion == 1) db.deleteObjectStore("surveyStore");
+      tally.put(0, 0);
+      suggested.put([], 0)
     };
     req.onsuccess = e => { this._db = e.target.result; resolve(this) }
   })
 }
 Drum.prototype = {
   get: function (ix) {
-    var store = this._db.transaction(["surveyStore"], "readwrite").objectStore("surveyStore");
-    return new Promise(resolve => store.get(ix).onsuccess = e => resolve(e.target.result))
+    var tally = this._db.transaction(["tallyStore"], "readwrite").objectStore("tallyStore");
+    return new Promise(resolve => tally.get(ix).onsuccess = e => resolve(e.target.result))
   },
   set: function (ix, content) {
-    var store = this._db.transaction(["surveyStore"], "readwrite").objectStore("surveyStore");
+    var tally = this._db.transaction(["tallyStore"], "readwrite").objectStore("tallyStore");
     return new Promise(resolve => {
-      store.put(content, ix);
-      store.put(ix, 0);
+      tally.put(content, ix);
+      tally.put(ix, 0);
       resolve(ix)
     })
+  },
+  unset: function(ix) {
+    var tally = this._db.transaction(["tallyStore"], "readwrite").objectStore("tallyStore");
+    return new Promise(resolve => {
+      tally.delete(ix--);
+      tally.put(ix, 0);
+      resolve(ix)
+    })
+  },
+  getOrder: function() {
+    var suggested = this._db.transaction(["suggestedStore"], "readwrite").objectStore("suggestedStore");
+    return new Promise(resolve => suggested.get(0).onsuccess = e => resolve(e.target.result))
+  },
+  setOrder: function (arr) {
+    var suggested = this._db.transaction(["suggestedStore"], "readwrite").objectStore("suggestedStore");
+    return new Promise(resolve => resolve(suggested.put(arr, 0)))
   },
   purge: function () { indexedDB.deleteDatabase("survey") },
   constructor: Drum
 };
 Drum.init = function () { return new Drum().then(d => window.drum = d) };
 
+function getFreq (acc) { return acc.reduce((a, x) => {a[x] = typeof a[x] == "undefined" ? 1 : a[x] + 1; return a}, {}) }
+function slug (str) { return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '') }
+function incrementListener(e) {
+  var country = e.target.parentNode.parentNode.dataset.country,
+      counter = $(`#${slug(country)} > .tally-count`)[0], freq;
+  drum.get(0).then(ix => drum.set(++ix, country));
+  counter.innerText = ++counter.innerText;
+  ticker.push(country);
+  freq = getFreq(ticker);
+  drum.setOrder(Object.keys(freq).sort((a, b) => freq[a] < freq[b]))
+}
+var ticker = [];
 $.addEvents({
   "": {
     load: function () {
-      Drum.init()
-    }
-  },
-  "#country": {
-    submit: function (e) {
-      var index, country = $("#country-list", e.target)[0].selectedOptions[0].innerText;
-      if (country[0] == "-") return false;
-      drum.get(0).then(ix => {
-        console.log(ix)
-        drum.set(++ix, country)
-      })
-    }
-  },
-  "#dump": {
-    click: function () {
-      drum.get(0).then(ix => {
-        if (ix == 0) return $("#result")[0].innerText = "No data";
-        var i = 1, acc = [], loop = () => {
-          return drum.get(i).then(val => {
-            acc.push(val);
-            if (i++ == ix) return acc.reduce((a, x) => {a[x] = typeof a[x] == "undefined" ? 1 : a[x] + 1; return a}, {});
-            else return loop()
+      function getAll() {
+        return drum.get(0).then(ix => {
+          if (ix == 0) return {};
+          var i = 1, loop = () => {
+            return drum.get(i).then(val => {
+              ticker.push(val);
+              if (i++ == ix) return getFreq(ticker);
+              else return loop()
+            })
+          };
+          return loop().then(obj => {
+            let row, frag = document.createDocumentFragment();
+            for (k in obj) {
+              $.load("tally", frag);
+              row = frag.lastChild;
+              row.setAttribute("id", slug(k));
+              row.dataset.country = k;
+              $(".tally-count", row)[0].innerText = obj[k];
+              $(".tally-country", row)[0].innerText = k;
+              $(`option[value='${k}']`)[0].remove()
+            }
+            return frag
           })
-        };
-        loop().then(obj => {
-          var text = "";
-          for (k in obj) text += k + ": " + obj[k] + ", ";
-          $("#result")[0].innerText = text.slice(0, -2)
         })
-      })
+      }
+      Drum.init().then(drum => Promise.all([getAll(), drum.getOrder()])).then(([frag, arr]) => {
+        arr.forEach(k => $("#tallies")[0].appendChild($("#" + slug(k), frag)[0]));
+        $.addEvents({"#tallies button": {click: incrementListener}})
+      });
+    }
+  },
+  "#increment-new": {
+    click: function (e) {
+      var index, country = $("#country-list")[0].selectedOptions[0].innerText, tallies = $("#tallies")[0];
+      if (country[0] == "-") return false;
+      $.load("tally", tallies);
+      row = tallies.lastChild;
+      row.setAttribute("id", slug(country));
+      row.dataset.country = country;
+      $(".tally-country", row)[0].innerText = country;
+      $.addEvents({".tally-increment > button": {click: incrementListener}}, row);
+      $(".tally-increment > button", row)[0].dispatchEvent(new Event("click"));
+      $("option")[0].selected = "selected";
+      $(`option[value='${country}']`)[0].remove()
     }
   },
   "#reset": {
-    click: () => drum.purge()
+    click: function () {
+      drum.purge();
+      Drum.init().then(drum => {
+        drum.set(0, 0);
+        drum.setOrder(ticker = [])
+      });
+      $(".tally-count").forEach(n => n.innerText = 0)
+    }
+  },
+  "#undo": {
+    click: function () {
+      drum.get(0).then(ix => {
+        if (ix == 0) return false;
+        drum.unset(ix);
+        let last = ticker.pop(), counter = $(`#${slug(last)} > .tally-count`)[0], freq = getFreq(ticker);
+        counter.innerText = --counter.innerText;
+        drum.setOrder(Object.keys(freq).sort((a, b) => freq[a] < freq[b]))
+      });
+    }
   }
 })
   </script>
