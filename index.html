@@ -8,6 +8,7 @@
   <meta name="description" content="Simple survey to record (client-side) the country of origin of a group of people.">
   <link rel="shortcut icon" href="data:image/png;base64,">
   <style>
+
 html, body {
   height: calc(100% - 2rem)
 }
@@ -41,7 +42,6 @@ h1 {
 }
 select {
   font-size: large;
-  margin-bottom: 2rem;
   width: calc(100% - 4rem)
 }
 button {
@@ -51,6 +51,7 @@ button {
 #increment-new, #undo {
   float: right
 }
+
   </style>
 </head>
 <body>
@@ -317,7 +318,7 @@ button {
   </footer>
   <template id="tally"
     ><div class="tally">
-      <div class="tally-count">0</div>
+      <div class="tally-count"></div>
       <div class="tally-country"></div>
       <div class="tally-increment">
         <button value="+1">+1</button>
@@ -325,13 +326,20 @@ button {
     </div
   ></template>
   <script>
-function $(sel, node) { return Array.prototype.slice.call( (node || document).querySelectorAll(sel) ) }
+
+// Utility functions
+function $ (sel, node) { return Array.prototype.slice.call( (node || document).querySelectorAll(sel) ) }
+
 $.addEvents = function (obj, node) {
   for (var q in obj) for (var e in obj[q])
     for (var ns = q ? $(q, node) : [window, document], es = e.split(" "), i = 0; i < es.length; i++)
       typeof ns === "undefined" || ns.forEach(n => n.addEventListener(es[i], obj[q][e].bind(n)))
 };
+
 $.load = function (id, node) { (node || document.body).appendChild(document.importNode($("#" + id)[0].content, true)) };
+
+
+// IndexedDB interface
 function Drum () {
   return new Promise(resolve => {
     var req = indexedDB.open("survey", 2);
@@ -346,6 +354,7 @@ function Drum () {
     req.onsuccess = e => { this._db = e.target.result; resolve(this) }
   })
 }
+
 Drum.prototype = {
   get: function (ix) {
     var tally = this._db.transaction(["tallyStore"], "readwrite").objectStore("tallyStore");
@@ -359,7 +368,7 @@ Drum.prototype = {
       resolve(ix)
     })
   },
-  unset: function(ix) {
+  unset: function (ix) {
     var tally = this._db.transaction(["tallyStore"], "readwrite").objectStore("tallyStore");
     return new Promise(resolve => {
       tally.delete(ix--);
@@ -367,7 +376,7 @@ Drum.prototype = {
       resolve(ix)
     })
   },
-  getOrder: function() {
+  getOrder: function () {
     var suggested = this._db.transaction(["suggestedStore"], "readwrite").objectStore("suggestedStore");
     return new Promise(resolve => suggested.get(0).onsuccess = e => resolve(e.target.result))
   },
@@ -375,94 +384,98 @@ Drum.prototype = {
     var suggested = this._db.transaction(["suggestedStore"], "readwrite").objectStore("suggestedStore");
     return new Promise(resolve => resolve(suggested.put(arr, 0)))
   },
-  purge: function () { indexedDB.deleteDatabase("survey") },
+  purge: function () {
+    this._db.close();
+    return new Promise(resolve => indexedDB.deleteDatabase("survey").onsuccess = resolve)
+  },
   constructor: Drum
 };
+
 Drum.init = function () { return new Drum().then(d => window.drum = d) };
 
-function getFreq (acc) { return acc.reduce((a, x) => {a[x] = typeof a[x] == "undefined" ? 1 : a[x] + 1; return a}, {}) }
-function slug (str) { return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '') }
-function incrementListener(e) {
-  var country = e.target.parentNode.parentNode.dataset.country,
-      counter = $(`#${slug(country)} > .tally-count`)[0], freq;
-  drum.get(0).then(ix => drum.set(++ix, country));
-  counter.innerText = ++counter.innerText;
-  ticker.push(country);
-  freq = getFreq(ticker);
-  drum.setOrder(Object.keys(freq).sort((a, b) => freq[a] < freq[b]))
+
+// Application functions
+function getFreq (acc) { return acc.reduce((a, x) => { a[x] = typeof a[x] == "undefined" ? 1 : a[x] + 1; return a }, {}) }
+
+function slug (str) { return str.toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "") }
+
+function insertTally ({parent, country, count}) {
+  $.load("tally", parent);
+  row = parent.lastChild;
+  row.setAttribute("id", slug(country));
+  row.dataset.country = country;
+  $(".tally-count", row)[0].innerText = count;
+  $(".tally-country", row)[0].innerText = country;
+  $(`option[value="${country}"]`)[0].remove();
+  $.addEvents({ ".tally-increment > button": { click: function (e) {
+    var country = e.target.parentNode.parentNode.dataset.country,
+        counter = $(`#${slug(country)} > .tally-count`)[0], freq;
+    drum.get(0).then(ix => drum.set(++ix, country));
+    counter.innerText = ++counter.innerText;
+    ticker.push(country);
+    freq = getFreq(ticker);
+    drum.setOrder(Object.keys(freq).sort((a, b) => freq[a] < freq[b]))
+  } } }, row);
+  return row
 }
-var ticker = [];
+
+
+// Initialise event handlers
 $.addEvents({
+
   "": {
     load: function () {
-      function getAll() {
-        return drum.get(0).then(ix => {
-          if (ix == 0) return {};
-          var i = 1, loop = () => {
-            return drum.get(i).then(val => {
-              ticker.push(val);
-              if (i++ == ix) return getFreq(ticker);
-              else return loop()
-            })
-          };
-          return loop().then(obj => {
-            let row, frag = document.createDocumentFragment();
-            for (k in obj) {
-              $.load("tally", frag);
-              row = frag.lastChild;
-              row.setAttribute("id", slug(k));
-              row.dataset.country = k;
-              $(".tally-count", row)[0].innerText = obj[k];
-              $(".tally-country", row)[0].innerText = k;
-              $(`option[value='${k}']`)[0].remove()
-            }
-            return frag
-          })
+      var buildTallies = () => drum.get(0).then(ix => {
+        let loop = () => drum.get(ix).then(val => {
+          ix && ticker.unshift(val);
+          return --ix > 0 ? loop() : getFreq(ticker)
+        });
+        return loop().then(obj => {
+          let frag = document.createDocumentFragment();
+          for (k in obj) insertTally({ parent: frag, country: k, count: obj[k] });
+          return frag
         })
-      }
-      Drum.init().then(drum => Promise.all([getAll(), drum.getOrder()])).then(([frag, arr]) => {
-        arr.forEach(k => $("#tallies")[0].appendChild($("#" + slug(k), frag)[0]));
-        $.addEvents({"#tallies button": {click: incrementListener}})
       });
+      Drum.init().then(drum => Promise.all([buildTallies(), drum.getOrder()])).then(([frag, arr]) => {
+        arr.forEach(k => $("#tallies")[0].appendChild($("#" + slug(k), frag)[0]))
+      })
     }
   },
+
   "#increment-new": {
     click: function (e) {
-      var index, country = $("#country-list")[0].selectedOptions[0].innerText, tallies = $("#tallies")[0];
+      var country = $("#country-list")[0].selectedOptions[0].innerText;
       if (country[0] == "-") return false;
-      $.load("tally", tallies);
-      row = tallies.lastChild;
-      row.setAttribute("id", slug(country));
-      row.dataset.country = country;
-      $(".tally-country", row)[0].innerText = country;
-      $.addEvents({".tally-increment > button": {click: incrementListener}}, row);
+      var row = insertTally({ parent: $("#tallies")[0], country, count: 0 });
       $(".tally-increment > button", row)[0].dispatchEvent(new Event("click"));
-      $("option")[0].selected = "selected";
-      $(`option[value='${country}']`)[0].remove()
+      $("option")[0].selected = "selected"
     }
   },
+
   "#reset": {
     click: function () {
-      drum.purge();
-      Drum.init().then(drum => {
-        drum.set(0, 0);
-        drum.setOrder(ticker = [])
-      });
+      drum.purge().then(Drum.init);
+      ticker = [];
       $(".tally-count").forEach(n => n.innerText = 0)
     }
   },
+
   "#undo": {
     click: function () {
       drum.get(0).then(ix => {
         if (ix == 0) return false;
         drum.unset(ix);
-        let last = ticker.pop(), counter = $(`#${slug(last)} > .tally-count`)[0], freq = getFreq(ticker);
+        let counter = $(`#${slug(ticker.pop())} > .tally-count`)[0], freq = getFreq(ticker);
         counter.innerText = --counter.innerText;
         drum.setOrder(Object.keys(freq).sort((a, b) => freq[a] < freq[b]))
       });
     }
   }
-})
+
+});
+
+var ticker = []
+
   </script>
 </body>
 </html>
